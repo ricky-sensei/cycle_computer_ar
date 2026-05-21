@@ -35,6 +35,7 @@ while True:
     asci = font.render("ABCDE abcde", True, (0,255,0))
     asci_bold = font_bold.render("ABCDE abcde", True, (0,255,0))
     japn = font.render("あいうえおアイウエオ山田太郎鈴木花子", True, (0,255,0))
+    sign = font.render ("˚ / # % & @ ", True, (0, 255, 0))
 
     ### 画面表示位置
     surface.blit(name, [20,20])
@@ -42,6 +43,7 @@ while True:
     surface.blit(asci, [20,120])
     surface.blit(asci_bold, [20,170])
     surface.blit(japn, [20,220])
+    surface.blit(sign , [20,270])
 
     ### 画面更新
     pygame.display.update()

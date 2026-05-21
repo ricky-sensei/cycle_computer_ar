@@ -1,11 +1,25 @@
 import pygame
 import sys
 import cv2
-from pygame.locals import *
+from rearview_camera import rearview_camera
+from pygame.locals import FULLSCREEN
 
 
 CAMERA_SIZE = (240, 180)
 CAMERA_MARGIN = 20
+TEXT_COLOR = (0, 255, 0)
+TEXT_X = 20
+VALUE_X = 200
+TEXT_Y = 20
+TEXT_LINE_HEIGHT = 40
+
+
+def draw_metric(screen, font, row, label, value):
+    y = TEXT_Y + (TEXT_LINE_HEIGHT * row)
+    label_text = font.render(label, True, TEXT_COLOR)
+    value_text = font.render(value, True, TEXT_COLOR)
+    screen.blit(label_text, [TEXT_X, y])
+    screen.blit(value_text, [VALUE_X, y])
 
 
 def main():
@@ -16,30 +30,24 @@ def main():
     pygame.init()  # Pygameの初期化
     screen = pygame.display.set_mode((0, 0), FULLSCREEN)  # 現在の画面解像度でフルスクリーン表示
     pygame.display.set_caption('cycle computer AR')  # 画面上部に表示するタイトルを設定
-    font1 = pygame.font.SysFont("sfcamera", 30)
+    font1 = pygame.font.SysFont("sfns", 30)
     font1_bold = pygame.font.SysFont("sfcamera", 30, bold=True)
     speed = 20
-    ratitude = [30.0125,"N"]
-    altitude = [141.0961, "E"]
+    latitude = [30.0125,"N"]
+    longitude = [141.0961, "E"]
+    altitude  = 100
     camera = cv2.VideoCapture(0)
     '''
     ゲーム内の動き
     '''
     while True:
         screen.fill((0, 0, 0))  # 画面を塗りつぶし((R, G, B))
-        speed_text = font1.render(f"SPEED:   {speed}km/h", True, (0, 255, 0))
-        screen.blit(speed_text, [20, 20])
+        draw_metric(screen, font1, 0, "SPEED", f"{speed}km/h")
+        draw_metric(screen, font1, 1, "LATITUDE", f"{latitude[0]}˚ {latitude[1]}")
+        draw_metric(screen, font1, 2, "LONGITUDE", f"{longitude[0]}˚ {longitude[1]}")
+        draw_metric(screen, font1, 3, "ALTITUDE", f"{altitude}km/h")
 
-        if camera.isOpened():
-            ret, frame = camera.read()
-            if ret:
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame = cv2.resize(frame, CAMERA_SIZE)
-                camera_surface = pygame.surfarray.make_surface(frame.swapaxes(0, 1))
-                screen_width, screen_height = screen.get_size()
-                camera_x = screen_width - CAMERA_SIZE[0] - CAMERA_MARGIN
-                camera_y = screen_height - CAMERA_SIZE[1] - CAMERA_MARGIN
-                screen.blit(camera_surface, (camera_x, camera_y))
+        rearview_camera(camera, CAMERA_SIZE, CAMERA_MARGIN, pygame.surfarray, screen)
 
         pygame.display.update()  # 画面を更新
         # イベント処理
@@ -50,13 +58,13 @@ def main():
                 sys.exit()
             
             if event.type == pygame.KEYDOWN:
-                if event.key == K_ESCAPE:
+                if event.key == pygame.K_ESCAPE:
                     camera.release()
                     pygame.quit()
                     sys.exit()
-                elif event.key == K_UP:
+                elif event.key == pygame.K_UP:
                     speed += 1
-                elif event.key == K_DOWN:
+                elif event.key == pygame.K_DOWN:
                     speed -= 1
                     
 
