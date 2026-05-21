@@ -1,23 +1,32 @@
 import pygame
 import sys
 import cv2
-from rearview_camera import rearview_camera
+from mock_gps import MockGPS
+from boot_animation import BootAnimation
+from rear_camera import Rear_Camera
 from pygame.locals import FULLSCREEN
 
 
 CAMERA_SIZE = (240, 180)
 CAMERA_MARGIN = 20
-TEXT_COLOR = (0, 255, 0)
+
 TEXT_X = 20
 VALUE_X = 200
 TEXT_Y = 20
 TEXT_LINE_HEIGHT = 40
 
+# color
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+rear_camera= Rear_Camera()
+boot_animation = BootAnimation()
 
 def draw_metric(screen, font, row, label, value):
     y = TEXT_Y + (TEXT_LINE_HEIGHT * row)
-    label_text = font.render(label, True, TEXT_COLOR)
-    value_text = font.render(value, True, TEXT_COLOR)
+    label_text = font.render(label, True, GREEN)
+    value_text = font.render(value, True, GREEN)
     screen.blit(label_text, [TEXT_X, y])
     screen.blit(value_text, [VALUE_X, y])
 
@@ -29,43 +38,42 @@ def main():
     '''
     pygame.init()  # Pygameの初期化
     screen = pygame.display.set_mode((0, 0), FULLSCREEN)  # 現在の画面解像度でフルスクリーン表示
-    pygame.display.set_caption('cycle computer AR')  # 画面上部に表示するタイトルを設定
     font1 = pygame.font.SysFont("sfns", 30)
     font1_bold = pygame.font.SysFont("sfcamera", 30, bold=True)
-    speed = 20
-    latitude = [30.0125,"N"]
-    longitude = [141.0961, "E"]
-    altitude  = 100
-    camera = cv2.VideoCapture(0)
+    gps = MockGPS()
+    surfarray = pygame.surfarray
+    boot_animation.play_boot_video(screen, pygame.time.Clock(), surfarray)
+
+
     '''
     ゲーム内の動き
     '''
     while True:
-        screen.fill((0, 0, 0))  # 画面を塗りつぶし((R, G, B))
-        draw_metric(screen, font1, 0, "SPEED", f"{speed}km/h")
-        draw_metric(screen, font1, 1, "LATITUDE", f"{latitude[0]}˚ {latitude[1]}")
-        draw_metric(screen, font1, 2, "LONGITUDE", f"{longitude[0]}˚ {longitude[1]}")
-        draw_metric(screen, font1, 3, "ALTITUDE", f"{altitude}km/h")
+        gps_data = gps.read()
 
-        rearview_camera(camera, CAMERA_SIZE, CAMERA_MARGIN, pygame.surfarray, screen)
+        screen.fill(BLACK)  # 画面を塗りつぶし((R, G, B))
+        draw_metric(screen, font1, 0, "GPS", "FIX" if gps_data["fix"] else "SEARCHING")
+        draw_metric(screen, font1, 1, "SPEED", f"{gps_data['speed_kmh']:.1f}km/h")
+        draw_metric(screen, font1, 2, "LATITUDE", f"{abs(gps_data['lat']):.6f}deg {gps_data['lat_dir']}")
+        draw_metric(screen, font1, 3, "LONGITUDE", f"{abs(gps_data['lon']):.6f}deg {gps_data['lon_dir']}")
+        draw_metric(screen, font1, 4, "ALTITUDE", f"{gps_data['altitude_m']:.1f}m")
+        draw_metric(screen, font1, 5, "HEADING", f"{gps_data['heading_deg']:.0f}deg")
+        draw_metric(screen, font1, 6, "SATELLITES", str(gps_data["satellites"]))
+        rear_camera.rear_camera(surfarray, screen)
 
         pygame.display.update()  # 画面を更新
         # イベント処理
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # 閉じるボタンが押されたら終了
-                camera.release()
+                rear_camera.camera.release()
                 pygame.quit()
                 sys.exit()
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    camera.release()
+                    rear_camera.camera.release()
                     pygame.quit()
                     sys.exit()
-                elif event.key == pygame.K_UP:
-                    speed += 1
-                elif event.key == pygame.K_DOWN:
-                    speed -= 1
                     
 
                     
