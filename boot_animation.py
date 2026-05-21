@@ -36,10 +36,4 @@ class BootAnimation:
                     pygame.quit()
                     sys.exit()
             clock.tick(fps)
-        self.video.release()
-                
-
-        
-        
-        
-            
+        self.video.release() 
