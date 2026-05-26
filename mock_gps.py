@@ -31,6 +31,7 @@ class MockGPS:
         }
 
     def _speed_kmh(self, elapsed):
+        # 22キロあたりでの数値を吐き出す
         base_speed = 22.0
         variation = math.sin(elapsed / 8.0) * 5.0
         return max(0.0, base_speed + variation)
