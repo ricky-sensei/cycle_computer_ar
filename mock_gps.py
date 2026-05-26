@@ -18,8 +18,8 @@ class MockGPS:
         lat, lon = self._move_from_start(distance_m, heading_deg)
 
         return {
-            "timestamp": elapsed,
-            "fix": elapsed >= 3.0,
+            "timestamp": elapsed, # 経過時間
+            "fix": elapsed >= 3.0, # GPSが測位できているかどうか:
             "lat": lat,
             "lat_dir": "N" if lat >= 0 else "S",
             "lon": lon,

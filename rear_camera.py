@@ -68,7 +68,7 @@ class Rear_Camera:
             screen.blit(rendered_line, line_rect)
             y += line_height
 
-    def rear_camera(self, surfarray, screen):
+    def rear_camera(self, surfarray, screen, frame_count):
         # エラー表示チェック用
         if self.camera.isOpened():
             ret, frame = self.camera.read()
@@ -78,6 +78,8 @@ class Rear_Camera:
                 frame = cv2.resize(frame, self.CAMERA_SIZE)
                 camera_surface = surfarray.make_surface(frame.swapaxes(0, 1))
                 camera_surface = self._round_corners(camera_surface)
+                alpha = 255 / 30 * frame_count if frame_count < 30 else 255
+                camera_surface.set_alpha(alpha)
                 screen.blit(camera_surface, camera_rect)
             else:
                 error_text = "video loading error"

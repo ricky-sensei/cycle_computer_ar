@@ -20,6 +20,9 @@ BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
+clock = pygame.time.Clock()
+
+
 rear_camera= Rear_Camera()
 boot_animation = BootAnimation()
 
@@ -37,6 +40,7 @@ def main():
         画面の大きさ、タイトル、必要なファイルの用意など
     '''
     pygame.init()  # Pygameの初期化
+    frame_count = 0
     screen = pygame.display.set_mode((0, 0), FULLSCREEN)  # 現在の画面解像度でフルスクリーン表示
     font1 = pygame.font.SysFont("sfns", 30)
     font1_bold = pygame.font.SysFont("sfcamera", 30, bold=True)
@@ -49,8 +53,10 @@ def main():
     ゲーム内の動き
     '''
     while True:
-        gps_data = gps.read()
+        if frame_count <= 30:
+            frame_count += 1
 
+        gps_data = gps.read()
         screen.fill(BLACK)  # 画面を塗りつぶし((R, G, B))
         draw_metric(screen, font1, 0, "GPS", "FIX" if gps_data["fix"] else "SEARCHING")
         draw_metric(screen, font1, 1, "SPEED", f"{gps_data['speed_kmh']:.1f}km/h")
@@ -59,9 +65,11 @@ def main():
         draw_metric(screen, font1, 4, "ALTITUDE", f"{gps_data['altitude_m']:.1f}m")
         draw_metric(screen, font1, 5, "HEADING", f"{gps_data['heading_deg']:.0f}deg")
         draw_metric(screen, font1, 6, "SATELLITES", str(gps_data["satellites"]))
-        rear_camera.rear_camera(surfarray, screen)
-
+        rear_camera.rear_camera(surfarray, screen, frame_count)
         pygame.display.update()  # 画面を更新
+        clock.tick(60)
+        
+
         # イベント処理
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # 閉じるボタンが押されたら終了
