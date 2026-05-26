@@ -42,7 +42,7 @@ def main():
     font1_bold = pygame.font.SysFont("sfcamera", 30, bold=True)
     gps = MockGPS()
     surfarray = pygame.surfarray
-    boot_animation.play_boot_video(screen, pygame.time.Clock(), surfarray)
+    # boot_animation.play_boot_video(screen, pygame.time.Clock(), surfarray)
 
 
     '''
