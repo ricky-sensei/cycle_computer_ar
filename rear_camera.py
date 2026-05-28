@@ -45,7 +45,7 @@ class Rear_Camera:
         max_text_height = camera_rect.height - (self.ERROR_TEXT_PADDING * 2)
 
         for font_size in range(self.ERROR_FONT_SIZE, self.ERROR_MIN_FONT_SIZE - 1, -1):
-            font = pygame.font.SysFont("sfcamera", font_size, bold=True)
+            font = pygame.font.SysFont("sfcamera", fonwet_size, bold=True)
             rendered_lines = [font.render(line, True, self.ERROR_COLOR) for line in lines]
             line_height = font.get_linesize()
             total_height = line_height * len(rendered_lines)

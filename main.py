@@ -34,6 +34,13 @@ def draw_metric(screen, font, row, label, value):
     screen.blit(value_text, [VALUE_X, y])
 
 
+def format_elapsed_time(elapsed_seconds):
+    total_seconds = int(elapsed_seconds)
+    minutes = total_seconds // 60
+    seconds = total_seconds % 60
+    return f"{minutes:02d}:{seconds:02d}"
+
+
 def main():
     '''
     ゲームの設定：
@@ -59,16 +66,16 @@ def main():
         gps_data = gps.read()
         screen.fill(BLACK)  # 画面を塗りつぶし((R, G, B))
         draw_metric(screen, font1, 0, "GPS", "FIX" if gps_data["fix"] else "SEARCHING")
-        draw_metric(screen, font1, 1, "SPEED", f"{gps_data['speed_kmh']:.1f}km/h")
-        draw_metric(screen, font1, 2, "LATITUDE", f"{abs(gps_data['lat']):.6f}deg {gps_data['lat_dir']}")
-        draw_metric(screen, font1, 3, "LONGITUDE", f"{abs(gps_data['lon']):.6f}deg {gps_data['lon_dir']}")
-        draw_metric(screen, font1, 4, "ALTITUDE", f"{gps_data['altitude_m']:.1f}m")
-        draw_metric(screen, font1, 5, "HEADING", f"{gps_data['heading_deg']:.0f}deg")
-        draw_metric(screen, font1, 6, "SATELLITES", str(gps_data["satellites"]))
+        draw_metric(screen, font1, 1, "TIME", format_elapsed_time(gps_data["timestamp"]))
+        draw_metric(screen, font1, 2, "SPEED", f"{gps_data['speed_kmh']:.1f}km/h")
+        draw_metric(screen, font1, 3, "LATITUDE", f"{abs(gps_data['lat']):.6f}deg {gps_data['lat_dir']}")
+        draw_metric(screen, font1, 4, "LONGITUDE", f"{abs(gps_data['lon']):.6f}deg {gps_data['lon_dir']}")
+        draw_metric(screen, font1, 5, "ALTITUDE", f"{gps_data['altitude_m']:.1f}m")
+        draw_metric(screen, font1, 6, "HEADING", f"{gps_data['heading_deg']:.0f}deg")
+        draw_metric(screen, font1, 7, "SATELLITES", str(gps_data["satellites"]))
         rear_camera.rear_camera(surfarray, screen, frame_count)
         pygame.display.update()  # 画面を更新
         clock.tick(60)
-        
 
         # イベント処理
         for event in pygame.event.get():
